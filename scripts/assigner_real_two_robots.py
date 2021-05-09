@@ -13,7 +13,7 @@ from numpy import array
 from numpy import linalg as LA
 from numpy import all as All
 from numpy import inf
-from functions import robot,informationGain,discount
+from functions_real_two_robots import robot,informationGain,discount
 from numpy.linalg import norm
 import time
 
@@ -43,7 +43,7 @@ def node():
 	rospy.init_node('assigner', anonymous=False)
 	
 	# fetching all parameters
-	map_topic= rospy.get_param('~map_topic','/map_merge/map')
+	map_topic= rospy.get_param('~map_topic','/map')
 	info_radius= rospy.get_param('~info_radius',1.0)					#this can be smaller than the laser scanner range, >> smaller >>less computation time>> too small is not good, info gain won't be accurate
 	info_multiplier=rospy.get_param('~info_multiplier',3.0)		
 	hysteresis_radius=rospy.get_param('~hysteresis_radius',3.0)			#at least as much as the laser scanner range
@@ -164,7 +164,7 @@ def node():
                 else:
                     stop += 1
 
-                    if (stop == rateHz*5):
+                    if (stop == rateHz*1000):
                         for i in range(0, n_robots):
                             robots[i].cancelGoal()
 

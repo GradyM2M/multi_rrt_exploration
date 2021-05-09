@@ -64,15 +64,9 @@ int main(int argc, char **argv)
   MTRand drand; // double in [0, 1) generator, already init
 
 // generate the same numbers as in the original C test program
-  ros::init(argc, argv, "global_rrt_frontier_detector");
+  ros::init(argc, argv, "local_rrt_frontier_detector");
   ros::NodeHandle nh;
-
-
-  //debug enabled
-  if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
-    ros::console::notifyLoggerLevelsChanged();
-  }
-
+  
   // fetching all parameters
   float eta,init_map_x,init_map_y,range;
   std::string map_topic,base_frame_topic;
@@ -81,7 +75,8 @@ int main(int argc, char **argv)
   ns=ros::this_node::getName();
 
   ros::param::param<float>(ns+"/eta", eta, 0.5);
-  ros::param::param<std::string>(ns+"/map_topic", map_topic, "robot_1/map"); 
+  ros::param::param<std::string>(ns+"/map_topic", map_topic, "/robot_1/map"); 
+  ros::param::param<std::string>(ns+"/robot_frame", base_frame_topic, "/robot_1/base_link"); 
 //---------------------------------------------------------------
 ros::Subscriber sub= nh.subscribe(map_topic, 100 ,mapCallBack);	
 ros::Subscriber rviz_sub= nh.subscribe("/clicked_point", 100 ,rvizCallBack);	
@@ -121,13 +116,13 @@ line.scale.y= 0.03;
 points.scale.x=0.3; 
 points.scale.y=0.3; 
 
-line.color.r =9.0/255.0;
-line.color.g= 91.0/255.0;
-line.color.b =236.0/255.0;
+line.color.r =255.0/255.0;
+line.color.g= 0.0/255.0;
+line.color.b =0.0/255.0;
 points.color.r = 255.0/255.0;
 points.color.g = 0.0/255.0;
 points.color.b = 0.0/255.0;
-points.color.a=1.0;
+points.color.a=0.3;
 line.color.a = 1.0;
 points.lifetime = ros::Duration();
 line.lifetime = ros::Duration();
@@ -194,7 +189,7 @@ int i=0;
 float xr,yr;
 std::vector<float> x_rand,x_nearest,x_new;
 
-
+tf::TransformListener listener;
 // Main loop
 while (ros::ok()){
 
@@ -219,37 +214,50 @@ x_new=Steer(x_nearest,x_rand,eta);
 // ObstacleFree    1:free     -1:unkown (frontier region)      0:obstacle
 char   checking=ObstacleFree(x_nearest,x_new,mapData);
 
-    if (checking==-1){
-            //geometry_msgs::PointStamped exploration_point;
+	  if (checking==-1){
 
-            // the first point of a frontier
-            p.x=x_new[0];
-            p.y=x_new[1];
-            p.z=0.0;
+      p.x=x_new[0];
+      p.y=x_new[1];
+      p.z=0.0;
 
-            ROS_DEBUG("before(%f, %f)", p.x, p.y);
-            bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
-            if (!existFrontier) {
-              continue;
-            }
+      bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
+      if (!existFrontier) {
+        continue;
+      }
+			exploration_goal.header.stamp=ros::Time(0);
+      exploration_goal.header.frame_id=mapData.header.frame_id;
 
-            exploration_goal.header.stamp=ros::Time(0);
-            exploration_goal.header.frame_id=mapData.header.frame_id;
-            //exploration_goal.point.x=x_new[0];
-            //exploration_goal.point.y=x_new[1];
-            exploration_goal.point.z=0.0;
+      //exploration_goal.point.x=x_new[0];
+      //exploration_goal.point.y=x_new[1];
+      exploration_goal.point.z=0.0;
 
-            //p.x = exploration_goal.point.x;
-            //p.y = exploration_goal.point.y;
-            points.points.push_back(p);
-
-            ROS_DEBUG("after(%f, %f)", p.x, p.y);
-
-            pub.publish(points) ;
-            targetspub.publish(exploration_goal);
-            points.points.clear();
-
-          }
+      //p.x = exploration_goal.point.x;
+      //p.y = exploration_goal.point.y;
+					
+      points.points.push_back(p);
+      pub.publish(points);
+      targetspub.publish(exploration_goal);
+      points.points.clear();
+      V.clear();
+		  	
+		  	
+			tf::StampedTransform transform;
+			int  temp=0;
+			while (temp==0){
+			try{
+			temp=1;
+			listener.lookupTransform(map_topic, base_frame_topic , ros::Time(0), transform);
+			}
+			catch (tf::TransformException ex){
+			temp=0;
+			ros::Duration(0.1).sleep();
+			}}
+			
+			x_new[0]=transform.getOrigin().x();
+			x_new[1]=transform.getOrigin().y();
+        	V.push_back(x_new);
+        	line.points.clear();
+        	}
 	  	
 	  
 	  else if (checking==1){

@@ -123,47 +123,150 @@ char out=0;
  
  
  return out;
- 
 
  }
- 
+
+bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& exploration_goal, nav_msgs::OccupancyGrid& mapsub) {
+
+  float Xstartx = mapsub.info.origin.position.x;
+  float Xstarty = mapsub.info.origin.position.y;
+  float resolution = mapsub.info.resolution;
+  unsigned int width = mapsub.info.width;
+  unsigned int height = mapsub.info.height;
+
+  unsigned int indx= (unsigned int)(floor((p.y-Xstarty)/resolution)*width+ floor((p.x-Xstartx)/resolution));
+
+  //std::vector<unsigned int> out = nhood8(indx, mapsub);
+
+  // center of the frontier
+  float centerx = 0;
+  float centery = 0;
+  unsigned int size = 1;
 
 
-     
-   
+  std::vector<signed char> data = mapsub.data;
+
+  if (data[indx] != -1) {
+    ROS_WARN("The real map is not match with the gridmap!");
+    return false;
+  }
+
+  std::queue<unsigned int> queue;
+  std::vector<bool> visited(width*height, false);
+
+  // push the initial cell
+  queue.push(indx);
+  visited[indx] = true;
+
+  while (!queue.empty()) {
+    unsigned int idx = queue.front();
+    queue.pop();
+
+    for (unsigned int nbr : nhood8(idx, mapsub)) {
+      if (isNewFrontierCell(nbr, mapsub, visited)) {
+        visited[nbr] = true;
+        queue.push(nbr);
+
+        std::vector<float> point = pointOfIndex(mapsub, nbr);
+        centerx += point[0];
+        centery += point[1];
+        size++;
+
+        //std::cout<<"-----------------------\n" << point[0] << "," << point[1]<< std::endl;
+
+      }
+    }
 
 
-  
- 
- 
- 
- 
+  }
+
+  exploration_goal.point.x = centerx/size;
+  exploration_goal.point.y = centery/size;
+
+  return true;
+}
+
+std::vector<unsigned int> nhood8(unsigned int indx, nav_msgs::OccupancyGrid& mapData) {
+
+  //returns grid value at "Xp" location
+  //map data:  100 occupied      -1 unknown       0 free
+  unsigned int width = mapData.info.width;
+  unsigned int height = mapData.info.height;
+  //float indx=(  floor((p.y-Xstarty)/resolution)*width)+( floor((p.x-Xstartx)/resolution) );
+  std::vector<unsigned int> out;
+  //std::vector<float> Xp;
+  //Xp.push_back(p.x);
+
+  if (indx > width * height - 1) {
+    ROS_WARN("Evaluating nhood for offmap point");
+    return out;
+  }
+
+  if (indx % width > 0) {
+    out.push_back(indx-1);
+  }
+
+  if (indx % width < (width-1)) {
+    out.push_back(indx+1);
+  }
+
+  if (indx >= width) {
+    out.push_back(indx - width);
+  }
+
+  if (indx < width * (height-1)) {
+    out.push_back(indx+width);
+  }
+
+  if (indx % width > 0 && indx >= width) {
+    out.push_back(indx-1-width);
+  }
+
+  if (indx % width > 0 && indx < width*(height-1)){
+    out.push_back(indx-1+width);
+  }
+
+  if (indx % width < (width -1) && indx>=width) {
+    out.push_back(indx+1-width);
+  }
+
+  if (indx % width < (width-1) && indx < width*(height-1)) {
+    out.push_back(indx+1+width);
+  }
+
+  return out;
+}
 
 
+bool isNewFrontierCell(unsigned indx, nav_msgs::OccupancyGrid& mapData, const std::vector<bool>& visited) {
+  std::vector<signed char> data = mapData.data;
 
+  //map data:  100 occupied      -1 unknown       0 free
+  if (data[indx] != -1 || visited[indx]) {
+    return false;
+  }
 
+  for (unsigned int nbr : nhood8(indx, mapData)) {
+    if (data[nbr] == 0) {
+      return true;
+    }
+  }
 
+  return false;
+}
 
+std::vector<float> pointOfIndex(nav_msgs::OccupancyGrid& mapData, unsigned int indx){
+  std::vector<float> point;
+  unsigned int width = mapData.info.width;
+  float Xstartx = mapData.info.origin.position.x;
+  float Xstarty = mapData.info.origin.position.y;
+  float resolution = mapData.info.resolution;
 
+  float x = Xstartx + (indx % width)*resolution;
+  float y = Xstarty + (indx / width)*resolution;
 
+  point.push_back(x);
+  point.push_back(y);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return point;
+}

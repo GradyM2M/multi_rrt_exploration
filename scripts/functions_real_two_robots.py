@@ -18,7 +18,7 @@ class robot:
 	def __init__(self,name):
 		self.assigned_point=[]
 		self.name=name
-		self.global_frame=rospy.get_param('~global_frame','map')
+		self.global_frame=rospy.get_param('~global_frame','/map')
 		self.listener=tf.TransformListener()
 		self.listener.waitForTransform(self.global_frame, name+'/base_footprint', rospy.Time(0),rospy.Duration(10.0))
 		cond=0;	
@@ -44,7 +44,7 @@ class robot:
 		cond=0;	
 		while cond==0:	
 			try:
-				(trans,rot) = self.listener.lookupTransform(self.global_frame, self.name+'/base_link', rospy.Time(0))
+				(trans,rot) = self.listener.lookupTransform(self.global_frame, self.name+'/base_footprint', rospy.Time(0))
 				cond=1
 			except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
 				cond==0

@@ -9,7 +9,7 @@ from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PointStamped 
 import tf
 from numpy import array,vstack,delete
-from functions import gridValue,informationGain
+from functions_real_two_robots import gridValue,informationGain
 from sklearn.cluster import MeanShift
 from rrt_exploration.msg import PointArray
 
@@ -46,7 +46,7 @@ def node():
 	rospy.init_node('filter', anonymous=False)
 	
 	# fetching all parameters
-	map_topic= rospy.get_param('~map_topic','/map_merge/map')
+	map_topic= rospy.get_param('~map_topic','/map')
 	threshold= rospy.get_param('~costmap_clearing_threshold',70)
 	info_radius= rospy.get_param('~info_radius',1.0)					#this can be smaller than the laser scanner range, >> smaller >>less computation time>> too small is not good, info gain won't be accurate
 	goals_topic= rospy.get_param('~goals_topic','/detected_points')	
@@ -68,9 +68,9 @@ def node():
  	
  	if len(namespace) > 0:	 
 	 	for i in range(0,n_robots):
-			rospy.Subscriber(namespace+str(i+namespace_init_count)+'/move_base/global_costmap/costmap', OccupancyGrid, globalMap) 
+			rospy.Subscriber(namespace+str(i+namespace_init_count)+'/move_base_node/global_costmap/costmap', OccupancyGrid, globalMap) 
 	elif len(namespace)==0:
-			rospy.Subscriber('/move_base/global_costmap/costmap', OccupancyGrid, globalMap) 	
+			rospy.Subscriber('/move_base_node/global_costmap/costmap', OccupancyGrid, globalMap) 	
 #wait if map is not received yet
 	while (len(mapData.data)<1):
 		pass
@@ -80,7 +80,7 @@ def node():
  		 	pass
 	
 	global_frame="/"+mapData.header.frame_id
-
+        
 
 	tfLisn=tf.TransformListener()
 	if len(namespace) > 0:

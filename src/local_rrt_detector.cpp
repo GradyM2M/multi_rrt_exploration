@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   ns=ros::this_node::getName();
 
   ros::param::param<float>(ns+"/eta", eta, 0.5);
-  ros::param::param<std::string>(ns+"/map_topic", map_topic, "/map_merge/map"); 
+  ros::param::param<std::string>(ns+"/map_topic", map_topic, "robot_1/map"); 
   ros::param::param<std::string>(ns+"/robot_frame", base_frame_topic, "/robot_1/base_footprint"); 
 //---------------------------------------------------------------
 ros::Subscriber sub= nh.subscribe(map_topic, 100 ,mapCallBack);	
@@ -216,20 +216,29 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
 
 	  if (checking==-1){
 
+      p.x=x_new[0];
+      p.y=x_new[1];
+      p.z=0.0;
+
+      bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
+      if (!existFrontier) {
+        continue;
+      }
 			exploration_goal.header.stamp=ros::Time(0);
-          	exploration_goal.header.frame_id=mapData.header.frame_id;
-          	exploration_goal.point.x=x_new[0];
-          	exploration_goal.point.y=x_new[1];
-          	exploration_goal.point.z=0.0;
-          	p.x=x_new[0]; 
-			p.y=x_new[1]; 
-			p.z=0.0;
+      exploration_goal.header.frame_id=mapData.header.frame_id;
+
+      //exploration_goal.point.x=x_new[0];
+      //exploration_goal.point.y=x_new[1];
+      exploration_goal.point.z=0.0;
+
+      //p.x = exploration_goal.point.x;
+      //p.y = exploration_goal.point.y;
 					
-          	points.points.push_back(p);
-          	pub.publish(points) ;
-          	targetspub.publish(exploration_goal);
-		  	points.points.clear();
-		  	V.clear();
+      points.points.push_back(p);
+      pub.publish(points);
+      targetspub.publish(exploration_goal);
+      points.points.clear();
+      V.clear();
 		  	
 		  	
 			tf::StampedTransform transform;
