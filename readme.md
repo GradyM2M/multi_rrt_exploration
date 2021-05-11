@@ -18,12 +18,9 @@ $ roslaunch multi_rrt_exploration rrt_three_robots.launch
 $ roslaunch multi_rrt_exploration rrt_three_robots.launch  
 
 2. 实物（导航）:  
-
 master: roscore  
-
 robot_0: export ROS_NAMESPACE=robot_0  
 robot_0: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_0  
-
 robot_1: export ROS_NAMESPACE=robot_1  
 robot_1: roslaunch robot_navigation robot_slam_laser_multi.launch tf_prefix:=robot_1  
 
