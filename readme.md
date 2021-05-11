@@ -18,6 +18,7 @@ $ roslaunch multi_rrt_exploration rrt_three_robots.launch
 $ roslaunch multi_rrt_exploration rrt_three_robots.launch  
 
 2. 实物（导航）:  
+
 master: roscore  
 
 robot_0: export ROS_NAMESPACE=robot_0  
