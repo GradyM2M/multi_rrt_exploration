@@ -12,6 +12,18 @@ $ roslaunch multi_rrt_exploration rrt_three_robots.launch
 2. 探索插件：[frontier_exploration](https://github.com/paulbovbel/frontier_exploration)
 3. 机器人模型：[turtlebot3](https://github.com/ROBOTIS-GIT/turtlebot3)
 4. [turtlebot3_msgs](https://github.com/ROBOTIS-GIT/turtlebot3_msgs)
+5. python库：
+```sh
+$ sudo apt-get install python-opencv
+```
+-Numpy
+```sh
+$ sudo apt-get install python-numpy
+```
+-Sklearn
+```sh
+$ sudo apt-get install python-scikits-learn
+```
 
 #### 使用说明
 1. 仿真:  
