@@ -14,7 +14,6 @@ $ roslaunch multi_rrt_exploration rrt_three_robots.launch
 4. [turtlebot3_msgs](https://github.com/ROBOTIS-GIT/turtlebot3_msgs)
 5. python库：OpenCV、Numpy、Sklearn
 
--OpenCV (cv2)
 ```sh
 $ sudo apt-get install python-opencv
 $ sudo apt-get install python-numpy
