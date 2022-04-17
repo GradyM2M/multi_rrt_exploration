@@ -28,22 +28,22 @@ $ roslaunch multi_rrt_exploration rrt_three_robots.launch
 
 2. 实物（导航）:  
 ```sh
-master: roscore  
-robot_0: export ROS_NAMESPACE=robot_0  
-robot_0: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_0  
-robot_1: export ROS_NAMESPACE=robot_1  
+master: roscore
+robot_0: export ROS_NAMESPACE=robot_0
+robot_0: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_0
+robot_1: export ROS_NAMESPACE=robot_1
 robot_1: roslaunch robot_navigation robot_slam_laser_multi.launch tf_prefix:=robot_1
 master: roslaunch multirobot_test robots_merge.launch
 ```  
 
 3. 实物（探索）:  
 ```sh  
-master: roslaunch multirobot_test robots_merge.launch  
-robot_: export ROS_NAMESPACE=robot_  
-robot_: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_  
-master: roslaunch explore_lite explore.launch 
+master: roslaunch multirobot_test robots_merge.launch
+robot_: export ROS_NAMESPACE=robot_
+robot_: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_
+master: roslaunch explore_lite explore.launch
 ```
 
-4. 修改说明:  
-robot_: 配置 launch文件中加入 move_base explore_robot_.launch 配置使用公共 /map 话题  
-修改 move_base global_costmap_params.yaml 、local_costmap_params.yaml中坐标系  
+修改说明:  
+robot_: 配置 launch文件中加入 move_base explore_robot_.launch 配置使用公共 /map 话题
+修改 move_base global_costmap_params.yaml 、local_costmap_params.yaml中坐标系
