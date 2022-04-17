@@ -1,7 +1,9 @@
 # multi_rrt_exploration
 
 This package is adapted from rrt_exploration. You could run the following command on the terminal:  
-$ roslaunch multi_rrt_exploration rrt_three_robots.launch   
+```sh
+$ roslaunch multi_rrt_exploration rrt_three_robots.launch
+```
 
 #### 介绍
 该功能包改编于GitHub上的开源项目[rrt_exploration](https://github.com/hasauino/rrt_exploration)，笔者已在ROS melodic下跑通（采用三台turtlebot3机器人测试），整体来看，该项目中所使用的RRT算法扩展性与稳定性较好，在计算机算力允许的范围内，能够扩展至更多的机器人数量。
