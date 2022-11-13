@@ -45,9 +45,11 @@ robot_: export ROS_NAMESPACE=robot_
 robot_: roslaunch rikirobot lidar_slam_multi.launch tf_prefix:=robot_
 master: roslaunch explore_lite explore.launch
 ```
-  ### 修改说明: 
-  1. robot_: 配置 launch文件中加入 move_base explore_robot_.launch 配置使用公共 /map 话题
-  2. 修改 move_base global_costmap_params.yaml 、local_costmap_params.yaml中坐标系
+
+### 修改说明: 
+1. robot_: 配置 launch文件中加入 move_base explore_robot_.launch 配置使用公共 /map 话题
+2. 修改 move_base global_costmap_params.yaml 、local_costmap_params.yaml中坐标系
+
 
 ## 部分实验结果：
 
